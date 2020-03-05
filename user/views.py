@@ -52,4 +52,20 @@ class UserView(View):
         except ValidationError:
             return JsonResponse({'message':'INVALID_EMAIL'}, status = 400)
 
+class AuthView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+
+        try:
+            user = User.objects.get(email = data['email'])
+
+            if bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
+                access_token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm = 'HS256')
+                return JsonResponse({'access_token':access_token.decode('utf-8')}, status = 200)
+
+            return JsonResponse({'message':'INVALID_PASSWORD'}, status = 401)
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER'}, status = 400)
+        except KeyError:
+            return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
 
