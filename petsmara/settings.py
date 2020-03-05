@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS += [
+    'corsheaders',
     'user',
 ]
 
@@ -142,6 +143,6 @@ CORS_ALLOW_HEADERS = (
     'origin',
     'user-agent',
     'x-csrftoken',
-    'x-requested-with',
+    'x-requested-width',
 )
 
