@@ -10,5 +10,5 @@
 * AWS EC2/S3
 
 ### 3. API Document
-[https://documenter.getpostman.com/view/9816693/SzKbNbJn?version=latest]
+https://documenter.getpostman.com/view/9816693/SzKbNbJn?version=latest
 
