@@ -3,7 +3,7 @@
 ### 1. Schema
 ![](https://images.velog.io/images/muchogusto/post/53731408-dc14-4459-8f5c-5b39f2cbbd8b/image.png)
 
-### 2. Technology Stack
+### 2. Technology
 * Python
 * Django
 * MySQL
