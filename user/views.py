@@ -61,7 +61,14 @@ class AuthView(View):
 
             if bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
                 access_token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm = 'HS256')
-                return JsonResponse({'access_token':access_token.decode('utf-8')}, status = 200)
+                return JsonResponse(
+                    {
+                        'access_token' : access_token.decode('utf-8'),
+                        'email'        : user.email,
+                        'nickname'     : user.nickname
+                    }, 
+                    status = 200
+                )
 
             return JsonResponse({'message':'INVALID_PASSWORD'}, status = 401)
         except User.DoesNotExist:
