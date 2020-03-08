@@ -50,7 +50,7 @@ class UserView(View):
                     'email'    : data['email'],
                     'nickname' : nickname
                 },
-                ,status = 200
+                status = 200
             )
 
         except KeyError:
