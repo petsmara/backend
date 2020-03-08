@@ -35,15 +35,23 @@ class UserView(View):
             validate_email(data['email'])
             
             hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+            
+            nickname = data['nickname'] if data['nickname'] else data['email'][0:data['email'].find('@')]
 
             User(
                 email        = data['email'],
-                nickname     = data['nickname'] if data['nickname'] else data['email'][0:data['email'].find('@')],
+                nickname     = nickname,
                 phone_number = data['phone_number'],
                 password     = hashed_password.decode('utf-8')
             ).save()
 
-            return HttpResponse(status = 200)
+            return JsonResponse(
+                {
+                    'email'    : data['email'],
+                    'nickname' : nickname
+                },
+                ,status = 200
+            )
 
         except KeyError:
             return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
