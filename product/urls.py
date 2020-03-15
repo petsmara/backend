@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls    import path
 
-# from .views import UserView, AuthView
+from .views import ProductView
 
 urlpatterns = [
-   # path('admin/', admin.site.urls),
+   path('', ProductView.as_view()),
    # path('/account/signup', UserView.as_view()),
 ]
