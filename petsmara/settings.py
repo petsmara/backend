@@ -32,6 +32,7 @@ INSTALLED_APPS += [
     'corsheaders',
     'user',
     'product',
+    'image',
 ]
 
 MIDDLEWARE = [
