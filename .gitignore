@@ -3,6 +3,7 @@
 
 ### My_Setting ###
 my_settings.py
+aws_settings.py
 
 ### Django ###
 *.log
