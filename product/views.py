@@ -16,7 +16,7 @@ class ProductView(View):
                 title = data['title'],
                 content = data['content'],
                 price = data['price'],
-                deal_spot = data['deal_spot']                
+                places = data['places']                
             ).save()
 
             return HttpResponse(status = 200)
