@@ -5,9 +5,11 @@ from django.views import View
 from django.http  import JsonResponse, HttpResponse
 from django.db    import IntegrityError
 
-from .models import Product, ProductCategory
+from .models    import Product, ProductCategory
+from user.utils import login_decorator
 
 class ProductView(View):
+    @login_decorator
     def post(self, request):
         data = json.loads(request.body)
 
@@ -18,7 +20,6 @@ class ProductView(View):
                 price = data['price'],
                 places = data['places']                
             ).save()
-
             return HttpResponse(status = 200)
 
         except KeyError:
