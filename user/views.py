@@ -3,14 +3,15 @@ import json
 import http
 import bcrypt
 
-from .models           import User
-from petsmara.settings import SECRET_KEY
-
 from django.views           import View
 from django.http            import JsonResponse, HttpResponse
 from django.db              import IntegrityError
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+
+from petsmara.settings import SECRET_KEY
+from .models           import User
+
 
 class UserView(View):
     def _validate(self, data):
