@@ -13,8 +13,8 @@ class Product(models.Model):
     title       = models.CharField(max_length = 500)
     content     = models.TextField()
     price       = models.DecimalField(max_digits=11, decimal_places=2)
-    places      = models.CharField(max_length                  = 1000)
-    # category_id = models.ForeignKey(ProductCategory, on_delete = models.CASCADE, null = True)
+    places      = models.CharField(max_length = 500)
+    category_id = models.ForeignKey(ProductCategory, on_delete = models.CASCADE, null = True)
     created_at  = models.DateTimeField(auto_now_add = True)
     modified_at = models.DateTimeField(auto_now = True)
 
