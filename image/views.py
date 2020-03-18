@@ -35,6 +35,8 @@ class ImageView(View):
 
             img_index = 1
             for file in files:
+                if img_index > 5:
+                    break
                 new_filename = self._new_filename(request.user.id, img_index, file)
                 self.s3_client.upload_fileobj(
                     file,
