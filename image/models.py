@@ -1,3 +1,15 @@
 from django.db import models
 
-# Create your models here.
+from product.models import Product
+
+class Image(models.Model):
+    product_id = models.ForeignKey(Product, on_delete = models.CASCADE, null = True)
+    image_1 = models.URLField(max_length = 2500, null = True)
+    image_2 = models.URLField(max_length = 2500, null = True)
+    image_3 = models.URLField(max_length = 2500, null = True)
+    image_4 = models.URLField(max_length = 2500, null = True)
+    image_5 = models.URLField(max_length = 2500, null = True)
+
+    class Meta:
+        db_table = 'images'
+
