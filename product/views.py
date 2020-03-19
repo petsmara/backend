@@ -2,19 +2,17 @@ import json
 import http
 
 from django.views import View
-from django.http  import JsonResponse, HttpResponse
 from django.db    import IntegrityError
+from django.http  import JsonResponse, HttpResponse
 
 from user.utils   import login_decorator
-from .models      import Product, ProductCategory
 from image.models import Image
-
+from .models      import Product, ProductCategory
 
 class ProductView(View):
     @login_decorator
     def post(self, request):
         data = json.loads(request.body)
-        print(request.user)
 
         try:
             product = Product(
@@ -31,7 +29,7 @@ class ProductView(View):
             for index, image in enumerate(data['images']):
                 images[index] = image
             Image(
-                product_id = product,
+                product = product,
                 image_1 = images.get(0),
                 image_2 = images.get(1),
                 image_3 = images.get(2),
