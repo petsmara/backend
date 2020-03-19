@@ -28,14 +28,16 @@ class ImageView(View):
 
     @login_decorator
     def post(self, request):
-        img_urls = []
+        data = json.loads(request.body)
+        limit = data.get('limit', 5)
+        img_ruls = []
 
         try:
             files = request.FILES.getlist('filename')
 
             img_index = 1
             for file in files:
-                if img_index > 5:
+                if img_index > limit:
                     break
                 new_filename = self._new_filename(request.user.id, img_index, file)
                 self.s3_client.upload_fileobj(
