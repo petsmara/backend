@@ -10,18 +10,20 @@ from image.models import Image
 from .models      import Product, ProductCategory
 
 class ProductView(View):
+    categories = ProductCategory.objects.all()
+
     @login_decorator
     def post(self, request):
         data = json.loads(request.body)
 
         try:
-            product = Product(
-                seller = request.user,
-                title = data['title'],
-                content = data['content'],
-                price = data['price'],
-                places = data['places'],
-                category_id = data['category']
+            product  = Product(
+                seller   = request.user,
+                title    = data['title'],
+                content  = data['content'],
+                price    = data['price'],
+                places   = data['places'],
+                category = categories.get(id = data['category'])
             )
             product.save()
 
