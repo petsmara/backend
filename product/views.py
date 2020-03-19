@@ -5,8 +5,8 @@ from django.views import View
 from django.http  import JsonResponse, HttpResponse
 from django.db    import IntegrityError
 
-from user.utils import login_decorator
-from .models import Product, ProductCategory
+from user.utils   import login_decorator
+from .models      import Product, ProductCategory
 from image.models import Image
 
 
@@ -14,13 +14,16 @@ class ProductView(View):
     @login_decorator
     def post(self, request):
         data = json.loads(request.body)
+        print(request.user)
 
         try:
             product = Product(
+                seller = request.user,
                 title = data['title'],
                 content = data['content'],
                 price = data['price'],
-                places = data['places']                
+                places = data['places'],
+                category_id = data['category']
             )
             product.save()
 
