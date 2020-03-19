@@ -28,8 +28,9 @@ class ImageView(View):
 
     @login_decorator
     def post(self, request):
-        img_urls = []
-        limit = 5
+        data = json.loads(request.body)
+        limit = data.get('limit', 5)
+        img_ruls = []
 
         try:
             files = request.FILES.getlist('filename')
