@@ -9,6 +9,36 @@ from user.utils   import login_decorator
 from image.models import Image
 from .models      import Product, ProductCategory
 
+class SingleProductView(View):
+    def get(self, request, product_id):
+        try:
+            product    = Product.objects.get(id=product_id)
+            images_set = Image.objects.filter(product=product)
+            
+            images = []
+            if images_set.exists():
+                images.append(images_set[0].image_1)
+                images.append(images_set[0].image_2)
+                images.append(images_set[0].image_3)
+                images.append(images_set[0].image_4)
+                images.append(images_set[0].image_5)
+
+            result                = {}
+            result['id']          = product.id
+            result['seller']      = product.seller.nickname
+            result['title']       = product.title
+            result['content']     = product.content
+            result['price']       = product.price
+            result['category']    = product.category.id
+            result['created_at']  = product.created_at
+            result['modified_at'] = product.modified_at
+            result['images']      = images
+
+            return JsonResponse({'result':result}, status = 200)
+        
+        except Product.DoesNotExist:
+            return JsonResponse({'message':'INVALID_ID'}, status = 401)
+
 class ProductView(View):
     categories = ProductCategory.objects.all()
 
