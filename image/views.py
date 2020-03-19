@@ -29,11 +29,13 @@ class ImageView(View):
 
     @login_decorator
     def post(self, request):
-        limit = request.POST.get('limit', 5)
+        limit = int(request.POST.get('limit')) if request.POST.get('limit') else 5
         img_urls = []
 
         try:
             files = request.FILES.getlist('filename')
+            if not files:
+                return JsonResponse({'message':'EMPTY_FILE'}, status = 204)
 
             img_index = 1
             for file in files:
@@ -45,7 +47,7 @@ class ImageView(View):
                     S3_BUCKET_NAME,
                     new_filename,
                     ExtraArgs={
-                        "ContentType": file.content_type
+                         "ContentType": file.content_type
                     }
                 )
                 img_urls.append(self.S3_URL + new_filename)
