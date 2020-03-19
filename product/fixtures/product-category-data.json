@@ -1,0 +1,30 @@
+[
+{
+  "model": "product.productcategory",
+  "pk": 1,
+  "fields": {
+    "title": "\uac15\uc544\uc9c0"
+  }
+},
+{
+  "model": "product.productcategory",
+  "pk": 2,
+  "fields": {
+    "title": "\uace0\uc591\uc774"
+  }
+},
+{
+  "model": "product.productcategory",
+  "pk": 3,
+  "fields": {
+    "title": "\uacf5\ud1b5"
+  }
+},
+{
+  "model": "product.productcategory",
+  "pk": 4,
+  "fields": {
+    "title": "\uae30\ud0c0"
+  }
+}
+]
