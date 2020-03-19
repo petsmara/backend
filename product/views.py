@@ -23,7 +23,7 @@ class ProductView(View):
                 content  = data['content'],
                 price    = data['price'],
                 places   = data['places'],
-                category = categories.get(id = data['category'])
+                category = self.categories.get(id = data['category'])
             )
             product.save()
 
@@ -38,8 +38,42 @@ class ProductView(View):
                 image_4 = images.get(3),
                 image_5 = images.get(4)
             ).save()
+            print(product.id)
 
             return HttpResponse(status = 200)
 
         except KeyError:
             return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
+
+    def get(self, request):
+        offset = int(request.GET['offset'])
+        limit  = int(request.GET['limit'])
+        result = list()
+
+        products = Product.objects.order_by('-created_at')[offset:limit].all()
+        for product in products:
+            images_set = Image.objects.filter(product=product)
+            images = []
+            if images_set.exists():
+                images.append(images_set[0].image_1)
+                images.append(images_set[0].image_2)
+                images.append(images_set[0].image_3)
+                images.append(images_set[0].image_4)
+                images.append(images_set[0].image_5)
+
+            result.append(
+                {
+                    "id"          : product.id,
+                    "title"       : product.title,
+                    "content"     : product.content,
+                    "price"       : product.price,
+                    "places"      : product.places,
+                    "category"    : product.category.id,
+                    "created_at"  : product.created_at,
+                    "modified_at" : product.modified_at,
+                    "images"      : images
+
+                }
+            )
+        
+        return JsonResponse({'result':result}, status = 200)
