@@ -1,12 +1,14 @@
+import json
+import uuid
 import boto3
 import datetime
 
 from django.views import View
 from django.http  import JsonResponse, HttpResponse
 
-from my_settings  import AWS_SECRET_KEY, AWS_ACCESS_SECRET_KEY
-from aws_settings import S3_URL, S3_BUCKET_NAME
 from user.utils   import login_decorator
+from aws_settings import S3_URL, S3_BUCKET_NAME
+from my_settings  import AWS_SECRET_KEY, AWS_ACCESS_SECRET_KEY
 
 class ImageView(View):
     s3_client = boto3.client(
@@ -16,36 +18,36 @@ class ImageView(View):
     )
     S3_URL = S3_URL
 
-    def _new_filename(self, user_id, index, file):
+    def _new_filename(self, user_id, index):
         infos = [
-            user_id, 
+            uuid.uuid3(uuid.NAMESPACE_URL, str(user_id)), 
             datetime.datetime.today().date(), 
-            index,
-            file.name
+            index
         ]
         new_filename = '-'.join(list(map(lambda info:str(info), infos)))
         return new_filename
 
     @login_decorator
     def post(self, request):
-        data = json.loads(request.body)
-        limit = data.get('limit', 5)
-        img_ruls = []
+        limit = int(request.POST.get('limit')) if request.POST.get('limit') else 5
+        img_urls = []
 
         try:
             files = request.FILES.getlist('filename')
+            if not files:
+                return JsonResponse({'message':'EMPTY_FILE'}, status = 204)
 
             img_index = 1
             for file in files:
                 if img_index > limit:
                     break
-                new_filename = self._new_filename(request.user.id, img_index, file)
+                new_filename = self._new_filename(request.user.id, img_index)
                 self.s3_client.upload_fileobj(
                     file,
                     S3_BUCKET_NAME,
                     new_filename,
                     ExtraArgs={
-                        "ContentType": file.content_type
+                         "ContentType": file.content_type
                     }
                 )
                 img_urls.append(self.S3_URL + new_filename)
