@@ -61,6 +61,7 @@ class ProductView(View):
             images = {}
             for index, image in enumerate(data['images']):
                 images[index] = image
+
             Image(
                 product = product,
                 image_1 = images.get(0),
@@ -69,7 +70,6 @@ class ProductView(View):
                 image_4 = images.get(3),
                 image_5 = images.get(4)
             ).save()
-            print(product.id)
 
             return HttpResponse(status = 200)
 
@@ -81,9 +81,9 @@ class ProductView(View):
         limit  = int(request.GET['limit'])
         result = list()
 
-        products = Product.objects.order_by('-created_at')[offset:limit].all()
+        products = Product.objects.order_by('-created_at')[offset:(offset+limit)].all()
         for product in products:
-            images_set = Image.objects.filter(product=product)
+            images_set = Image.objects.filter(product = product)
             images = []
             if images_set.exists():
                 images.append(images_set[0].image_1)
