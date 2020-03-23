@@ -30,6 +30,7 @@ class SingleProductView(View):
             result['content']     = product.content
             result['price']       = product.price
             result['category']    = product.category.id
+            result['places']      = product.places
             result['created_at']  = product.created_at
             result['modified_at'] = product.modified_at
             result['images']      = images
