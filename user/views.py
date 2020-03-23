@@ -9,7 +9,7 @@ from django.db              import IntegrityError
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from petsmara.settings import SECRET_KEY
+from my_settings import SECRET_KEY
 from .models           import User
 
 
@@ -21,7 +21,6 @@ class UserView(View):
             return JsonResponse({'message':'DUPLICATE_EMAIL'}, status = 400)
         # if (len(data['nickname']) > 0) and (User.objects.filter(nickname = data['nickname']).exists()):
         #    return JsonResponse({'message':'DUPLICATE_NICKNAME'}, status = 400)
-
         return None
 
     def post(self, request):
@@ -36,21 +35,25 @@ class UserView(View):
             validate_email(data['email'])
             
             hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-            
             nickname = data['nickname'] if data['nickname'] else data['email'][0:data['email'].find('@')]
 
-            User(
-                email        = data['email'],
-                nickname     = nickname,
-                phone_number = data['phone_number'],
-                password     = hashed_password.decode('utf-8')
-            ).save()
+            user = User(
+                        email        = data['email'],
+                        nickname     = nickname,
+                        phone_number = data['phone_number'],
+                        password     = hashed_password.decode('utf-8')
+                    )
+            user.save()
+
+            print("haha",user.id)
+            access_token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm = 'HS256')
 
             return JsonResponse(
                 {
-                    'email'    : data['email'],
-                    'nickname' : nickname
-                },
+                    'email'        : data['email'],
+                    'nickname'     : nickname,
+                    'access_token' : access_token.decode('utf-8')
+                 },
                 status = 200
             )
 
