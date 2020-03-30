@@ -11,33 +11,35 @@ from django.core.exceptions import ValidationError
 
 from my_settings    import SECRET_KEY
 from product.models import Product
+from image.models   import Image
 from .models        import User
 from .utils         import login_decorator    
 
 class UserProductView(View):
     @login_decorator
     def get(self, request, sale_status):
-        offset = int(request.GET['offset'],0)
-        limit  = int(request.GET['limit'],5)
+        offset = int(request.GET['offset'])
+        limit  = int(request.GET['limit'])
 
         on_sale = sale_status
-        products = list(
-                        Product.objects.select_related('seller'
+        products = Product.objects.select_related('seller'
+                            ).prefetch_related('image'
                             ).filter(seller=request.user
                             ).filter(on_sale=on_sale
-                            )[offset:(offset+limit)].values(
-                            'id','title','category','places','price','image','on_sale')
-                    )
+                            )[offset:(offset+limit)
+                            ].values('title','category','places','price','on_sale','image__image_1'
+                            )
 
-        return JsonResponse({'products':products}, status = 200)
+        return JsonResponse({'products':list(products)}, status = 200)
 
 class UserProfile(View):
     @login_decorator
     def get(self, request):
         result = {}
         result['nickname'] = request.user.nickname
-        result['has_dog']  = request.user.has_dog
-        result['has_cat']  = request.user.has_cat
+        result['categoryList']  = [ 1 if request.user.has_dog else 0,
+                                    1 if request.user.has_cat else 0]
+
         return JsonResponse({'result':result}, status = 200)
 
 class UserView(View):
@@ -46,8 +48,7 @@ class UserView(View):
             return JsonResponse({'message':'INVALID_PASSWORD'}, status = 400)
         if User.objects.filter(email = data['email']).exists():
             return JsonResponse({'message':'DUPLICATE_EMAIL'}, status = 400)
-        # if (len(data['nickname']) > 0) and (User.objects.filter(nickname = data['nickname']).exists()):
-        #    return JsonResponse({'message':'DUPLICATE_NICKNAME'}, status = 400)
+        
         return None
 
     def post(self, request):
@@ -68,6 +69,8 @@ class UserView(View):
                         email        = data['email'],
                         nickname     = nickname,
                         phone_number = data['phone_number'],
+                        has_dog      = data['categoryList'][0],
+                        has_cat      = data['categoryList'][1],
                         password     = hashed_password.decode('utf-8')
                     )
             user.save()
@@ -80,7 +83,11 @@ class UserView(View):
                     'email'        : data['email'],
                     'nickname'     : nickname,
                     'access_token' : access_token.decode('utf-8')
-                 },
+                    'categoryList': [
+                                        1 if user.has_dog else 0,
+                                        1 if user.has_cat else 0
+                                    ]
+                },
                 status = 200
             )
 

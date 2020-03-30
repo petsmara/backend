@@ -12,18 +12,9 @@ from .models      import Product, ProductCategory
 class SingleProductView(View):
     def get(self, request, product_id):
         try:
-            product    = Product.objects.get(id=product_id)
-            images_set = Image.objects.filter(product=product)
-            
-            images = []
-            if images_set.exists():
-                images.append(images_set[0].image_1)
-                images.append(images_set[0].image_2)
-                images.append(images_set[0].image_3)
-                images.append(images_set[0].image_4)
-                images.append(images_set[0].image_5)
+            product    = Product.objects.select_related('image').get(id=product_id)
 
-            result                = {}
+            result                = dict()
             result['id']          = product.id
             result['seller']      = product.seller.nickname
             result['title']       = product.title
@@ -33,7 +24,13 @@ class SingleProductView(View):
             result['places']      = product.places
             result['created_at']  = product.created_at
             result['modified_at'] = product.modified_at
-            result['images']      = images
+            result['images']      = [
+                                        product.image.image_1,
+                                        product.image.image_2,
+                                        product.image.image_3,
+                                        product.image.image_4,
+                                        product.image.image_5
+                                    ] if product.image else None
 
             return JsonResponse({'result':result}, status = 200)
         
@@ -48,29 +45,28 @@ class ProductView(View):
         data = json.loads(request.body)
 
         try:
+            images = dict()
+            for index, image in enumerate(data['images']):
+                images[index] = image
+            image = Image(
+                    image_1 = images.get(0),
+                    image_2 = images.get(1),
+                    image_3 = images.get(2),
+                    image_4 = images.get(3),
+                    image_5 = images.get(4)
+                )
+            image.save()
+
             product  = Product(
                 seller   = request.user,
                 title    = data['title'],
                 content  = data['content'],
                 price    = data['price'],
                 places   = data['places'],
-                on_sale  = data['on_sale'],
+                image    = image,
                 category = self.categories.get(id = data['category'])
-            )
+                )
             product.save()
-
-            images = {}
-            for index, image in enumerate(data['images']):
-                images[index] = image
-
-            Image(
-                product = product,
-                image_1 = images.get(0),
-                image_2 = images.get(1),
-                image_3 = images.get(2),
-                image_4 = images.get(3),
-                image_5 = images.get(4)
-            ).save()
 
             return JsonResponse({'product_id':product.id}, status = 200)
 
@@ -82,17 +78,8 @@ class ProductView(View):
         limit  = int(request.GET['limit'])
         result = list()
 
-        products = Product.objects.order_by('-created_at')[offset:(offset+limit)].all()
+        products = Product.objects.select_related('image').order_by('-created_at')[offset:(offset+limit)].all()
         for product in products:
-            images_set = Image.objects.filter(product = product)
-            images = []
-            if images_set.exists():
-                images.append(images_set[0].image_1)
-                images.append(images_set[0].image_2)
-                images.append(images_set[0].image_3)
-                images.append(images_set[0].image_4)
-                images.append(images_set[0].image_5)
-
             result.append(
                 {
                     "id"          : product.id,
@@ -103,9 +90,16 @@ class ProductView(View):
                     "category"    : product.category.id,
                     "created_at"  : product.created_at,
                     "modified_at" : product.modified_at,
-                    "images"      : images
-
+                    "images"      : [
+                                        product.image.image_1,
+                                        product.image.image_2,
+                                        product.image.image_3,
+                                        product.image.image_4,
+                                        product.image.image_5
+                                    ] if product.image else None
                 }
             )
         
         return JsonResponse({'result':result}, status = 200)
+
+
