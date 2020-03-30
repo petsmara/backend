@@ -15,10 +15,10 @@ class Product(models.Model):
     price       = models.DecimalField(max_digits = 11, decimal_places = 2)
     places      = models.CharField(max_length = 500, null = True)
     category    = models.ForeignKey(ProductCategory, on_delete = models.CASCADE, null = True)
-    on_sale     = models.NullBooleanField(default = False)
+    on_sale     = models.NullBooleanField(default = True)
     created_at  = models.DateTimeField(auto_now_add = True)
     modified_at = models.DateTimeField(auto_now = True)
 
     class Meta:
         db_table = 'products'
-    
+
