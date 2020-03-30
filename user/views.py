@@ -37,9 +37,8 @@ class UserProfile(View):
     def get(self, request):
         result = {}
         result['nickname'] = request.user.nickname
-        result['categoryList']  = [ 1 if request.user.has_dog else 0,
-                                    1 if request.user.has_cat else 0]
-
+        result['has_dog']  = request.user.has_dog
+        result['has_cat']  = reqeust.user.has_cat
         return JsonResponse({'result':result}, status = 200)
 
 class UserView(View):
@@ -69,24 +68,21 @@ class UserView(View):
                         email        = data['email'],
                         nickname     = nickname,
                         phone_number = data['phone_number'],
-                        has_dog      = data['categoryList'][0],
-                        has_cat      = data['categoryList'][1],
+                        has_dog      = data['has_dog'],
+                        has_cat      = data['has_cat'],
                         password     = hashed_password.decode('utf-8')
                     )
             user.save()
 
-            print("haha",user.id)
             access_token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm = 'HS256')
 
             return JsonResponse(
                 {
                     'email'        : data['email'],
                     'nickname'     : nickname,
-                    'access_token' : access_token.decode('utf-8')
-                    'categoryList': [
-                                        1 if user.has_dog else 0,
-                                        1 if user.has_cat else 0
-                                    ]
+                    'access_token' : access_token.decode('utf-8'),
+                    'has_dog'      : user.has_dog,
+                    'has_cat'      : user.has_cat
                 },
                 status = 200
             )
@@ -111,7 +107,9 @@ class AuthView(View):
                     {
                         'access_token' : access_token.decode('utf-8'),
                         'email'        : user.email,
-                        'nickname'     : user.nickname
+                        'nickname'     : user.nickname,
+                        'has_dog'      : user.has_dog,
+                        'has_cat'      : user.has_cat
                     }, 
                     status = 200
                 )
