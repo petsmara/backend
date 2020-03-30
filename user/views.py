@@ -35,10 +35,11 @@ class UserProductView(View):
 class UserProfile(View):
     @login_decorator
     def get(self, request):
-        result = {}
+        result = dict()
         result['nickname'] = request.user.nickname
         result['has_dog']  = request.user.has_dog
         result['has_cat']  = reqeust.user.has_cat
+        
         return JsonResponse({'result':result}, status = 200)
 
 class UserView(View):
