@@ -10,8 +10,17 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
 from my_settings import SECRET_KEY
-from .models           import User
+from .models     import User
+from .utils      import login_decorator    
 
+class UserProfile(View):
+    @login_decorator
+    def get(self, request):
+        result = {}
+        result['nickname'] = request.user.nickname
+        result['has_dog'] = True
+        result['has_cat'] = True
+        return JsonResponse({'result':result}, status = 200)
 
 class UserView(View):
     def _validate(self, data):
