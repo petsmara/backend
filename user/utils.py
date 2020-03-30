@@ -20,7 +20,7 @@ def login_decorator(func):
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status = 400)
         except KeyError:
-            return JsonRespose({'message':'INVALID_KEY'}, status = 400)
+            return JsonResponse({'message':'INVALID_KEY'}, status = 400)
 
     return wrapper
 

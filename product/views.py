@@ -54,6 +54,7 @@ class ProductView(View):
                 content  = data['content'],
                 price    = data['price'],
                 places   = data['places'],
+                on_sale  = data['on_sale'],
                 category = self.categories.get(id = data['category'])
             )
             product.save()

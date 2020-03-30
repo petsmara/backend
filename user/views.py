@@ -9,9 +9,27 @@ from django.db              import IntegrityError
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from my_settings import SECRET_KEY
-from .models     import User
-from .utils      import login_decorator    
+from my_settings    import SECRET_KEY
+from product.models import Product
+from .models        import User
+from .utils         import login_decorator    
+
+class UserProductView(View):
+    @login_decorator
+    def get(self, request, sale_status):
+        offset = int(request.GET['offset'],0)
+        limit  = int(request.GET['limit'],5)
+
+        on_sale = sale_status
+        products = list(
+                        Product.objects.select_related('seller'
+                            ).filter(seller=request.user
+                            ).filter(on_sale=on_sale
+                            )[offset:(offset+limit)].values(
+                            'id','title','category','places','price','image','on_sale')
+                    )
+
+        return JsonResponse({'products':products}, status = 200)
 
 class UserProfile(View):
     @login_decorator
