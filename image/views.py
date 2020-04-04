@@ -1,7 +1,7 @@
 import json
 import uuid
 import boto3
-import datetime
+import time
 
 from django.views import View
 from django.http  import JsonResponse, HttpResponse
@@ -21,7 +21,7 @@ class ImageView(View):
     def _new_filename(self, user_id, index):
         infos = [
             uuid.uuid3(uuid.NAMESPACE_URL, str(user_id)), 
-            datetime.datetime.today().date(), 
+            time.time()
             index
         ]
         new_filename = '-'.join(list(map(lambda info:str(info), infos)))
