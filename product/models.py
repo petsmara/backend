@@ -1,6 +1,7 @@
 from django.db import models
 
-from  user.models import User
+from user.models  import User
+from image.models import Image
 
 class ProductCategory(models.Model):
     title = models.CharField(max_length = 500)
@@ -16,6 +17,7 @@ class Product(models.Model):
     places      = models.CharField(max_length = 500, null = True)
     category    = models.ForeignKey(ProductCategory, on_delete = models.CASCADE, null = True)
     on_sale     = models.NullBooleanField(default = True)
+    image       = models.ForeignKey(Image, on_delete = models.CASCADE, null = True)
     created_at  = models.DateTimeField(auto_now_add = True)
     modified_at = models.DateTimeField(auto_now = True)
 

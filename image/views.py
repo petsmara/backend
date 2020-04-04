@@ -21,7 +21,7 @@ class ImageView(View):
     def _new_filename(self, user_id, index):
         infos = [
             uuid.uuid3(uuid.NAMESPACE_URL, str(user_id)), 
-            time.time()
+            time.time(),
             index
         ]
         new_filename = '-'.join(list(map(lambda info:str(info), infos)))

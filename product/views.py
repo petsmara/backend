@@ -22,6 +22,7 @@ class SingleProductView(View):
             result['price']       = product.price
             result['category']    = product.category.id
             result['places']      = product.places
+            result['on_sale']     = product.on_sale
             result['created_at']  = product.created_at
             result['modified_at'] = product.modified_at
             result['images']      = [
@@ -34,6 +35,21 @@ class SingleProductView(View):
 
             return JsonResponse({'result':result}, status = 200)
         
+        except Product.DoesNotExist:
+            return JsonResponse({'message':'INVALID_ID'}, status = 401)
+
+    @login_decorator
+    def put(self, request, product_id):
+        try:
+            product    = Product.objects.select_related('image').get(id=product_id)
+
+            if product.seller == request.user:
+                product.on_sale = False
+                product.save()
+                return JsonResponse({'message':'SUCCESS'}, status = 200)
+            else:
+                return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
+
         except Product.DoesNotExist:
             return JsonResponse({'message':'INVALID_ID'}, status = 401)
 
