@@ -10,11 +10,8 @@ from image.models import Image
 from .models      import Product, ProductCategory
 
 class SingleProductView(View):
-    def get(self, request, product_id):
-        try:
-            product    = Product.objects.select_related('image').get(id=product_id)
-
-            result                = dict()
+    def _product_info(self, product):
+            result                = {}
             result['id']          = product.id
             result['seller']      = product.seller.nickname
             result['title']       = product.title
@@ -32,7 +29,12 @@ class SingleProductView(View):
                                         product.image.image_4,
                                         product.image.image_5
                                     ] if product.image else None
+            return result
 
+    def get(self, request, product_id):
+        try:
+            product = Product.objects.select_related('image').get(id=product_id)
+            result  = self._product_info(prodcut)
             return JsonResponse({'result':result}, status = 200)
         
         except Product.DoesNotExist:
@@ -46,7 +48,8 @@ class SingleProductView(View):
             if product.seller == request.user:
                 product.on_sale = False
                 product.save()
-                return JsonResponse({'message':'SUCCESS'}, status = 200)
+                result = self._product_info(product)
+                return JsonResponse({'result':result}, status = 200)
             else:
                 return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
 
