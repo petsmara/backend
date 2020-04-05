@@ -97,7 +97,7 @@ class ProductView(View):
         limit  = int(request.GET['limit'])
         result = list()
 
-        products = Product.objects.select_related('image').order_by('-created_at')[offset:(offset+limit)].all()
+        products = Product.objects.select_related('image').filter(on_sale=True).order_by('-created_at')[offset:(offset+limit)].all()
         for product in products:
             result.append(
                 {
@@ -106,6 +106,7 @@ class ProductView(View):
                     "content"     : product.content,
                     "price"       : product.price,
                     "places"      : product.places,
+                    "on_sale"     : product.on_sale,
                     "category"    : product.category.id,
                     "created_at"  : product.created_at,
                     "modified_at" : product.modified_at,
