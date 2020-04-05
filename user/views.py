@@ -27,7 +27,7 @@ class UserProductView(View):
                             ).filter(seller=request.user
                             ).filter(on_sale=on_sale
                             )[offset:(offset+limit)
-                            ].values('title','category','places','price','on_sale','image__image_1'
+                            ].values('id','title','category','places','price','on_sale','image__image_1'
                             )
 
         return JsonResponse({'products':list(products)}, status = 200)
