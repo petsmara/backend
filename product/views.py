@@ -34,16 +34,16 @@ class SingleProductView(View):
     def get(self, request, product_id):
         try:
             product = Product.objects.select_related('image').get(id=product_id)
-            result  = self._product_info(prodcut)
+            result  = self._product_info(product)
             return JsonResponse({'result':result}, status = 200)
         
         except Product.DoesNotExist:
-            return JsonResponse({'message':'INVALID_ID'}, status = 401)
+            return JsonResponse({'message':'INVALID_PRODUCT_ID'}, status = 401)
 
     @login_decorator
     def put(self, request, product_id):
         try:
-            product    = Product.objects.select_related('image').get(id=product_id)
+            product = Product.objects.select_related('image').get(id=product_id)
 
             if product.seller == request.user:
                 product.on_sale = False
@@ -55,6 +55,20 @@ class SingleProductView(View):
 
         except Product.DoesNotExist:
             return JsonResponse({'message':'INVALID_ID'}, status = 401)
+
+    @login_decorator
+    def delete(self, request, product_id):
+        try:
+            product = Product.objects.select_related('image').get(id=product_id)
+
+            if product.seller == request.user:
+                product.delete()
+                return JsonResponse({'message':'DELETED'}, status = 200)
+            else:
+                return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
+
+        except Product.DoesNotExist:
+            return JsonResponse({'message':'INVALID_PRODUCT_ID'}, status = 401)
 
 class ProductView(View):
     categories = ProductCategory.objects.all()
