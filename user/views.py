@@ -26,8 +26,8 @@ class UserProductView(View):
                             ).prefetch_related('image'
                             ).filter(seller=request.user
                             ).filter(on_sale=on_sale
-                            )[offset:(offset+limit)
-                            ].values('id','title','category','places','price','on_sale','image__image_1'
+                            ).order_by('-created_at')[offset:(offset+limit)
+                            ].values('id','title','category','places','price','on_sale','image__image_1','created_at'
                             )
 
         return JsonResponse({'products':list(products)}, status = 200)
