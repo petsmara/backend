@@ -1,9 +1,10 @@
 import json
 import http
 
-from django.views import View
-from django.db    import IntegrityError
-from django.http  import JsonResponse, HttpResponse
+from django.views     import View
+from django.db        import IntegrityError
+from django.db.models import Q
+from django.http      import JsonResponse, HttpResponse
 
 from user.utils   import login_decorator
 from image.models import Image
@@ -108,13 +109,15 @@ class ProductView(View):
 
 class ProductListView(View):
     def get(self, request):
-        on_sale= False if request.GET['on_sale'] == "false" else True
-        offset = int(request.GET['offset'])
-        limit  = int(request.GET['limit'])
+        on_sale= False if request.GET.get('on_sale',0) == "false" else True
+        offset = int(request.GET.get('offset',0))
+        limit  = int(request.GET.get('limit',10))
+        product_id = int(request.GET.get('product_id',0))
         result = list()
 
         products = Product.objects.select_related('image'
                                                  ).filter(on_sale=on_sale
+                                                 ).filter(Q(id__gt = product_id)|Q(id__lt = product_id)
                                                  ).order_by('-created_at'
                                                  )[offset:(offset+limit)].all()
         for product in products:
