@@ -7,8 +7,7 @@ from django.views import View
 from django.http  import JsonResponse, HttpResponse
 
 from user.utils   import login_decorator
-from aws_settings import S3_URL, S3_BUCKET_NAME
-from my_settings  import AWS_SECRET_KEY, AWS_ACCESS_SECRET_KEY
+from aws_settings import S3_URL, S3_BUCKET_NAME, AWS_SECRET_KEY, AWS_ACCESS_SECRET_KEY
 
 class ImageView(View):
     s3_client = boto3.client(
