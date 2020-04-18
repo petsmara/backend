@@ -36,7 +36,7 @@ class SingleProductView(View):
             product = Product.objects.select_related('image').get(id=product_id)
             result  = self._product_info(product)
             return JsonResponse({'result':result}, status = 200)
-        
+
         except Product.DoesNotExist:
             return JsonResponse({'message':'INVALID_PRODUCT_ID'}, status = 401)
 
@@ -59,7 +59,7 @@ class SingleProductView(View):
     @login_decorator
     def delete(self, request, product_id):
         try:
-            product = Product.objects.select_related('image').get(id=product_id)
+            product = Product.objects.select_related('image').get(id=product_id, seller=request.user)
 
             if product.seller == request.user:
                 product.delete()
@@ -106,12 +106,17 @@ class ProductView(View):
         except KeyError:
             return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
 
+class ProductListView(View):
     def get(self, request):
+        on_sale= False if request.GET['on_sale'] == "false" else True
         offset = int(request.GET['offset'])
         limit  = int(request.GET['limit'])
         result = list()
 
-        products = Product.objects.select_related('image').filter(on_sale=True).order_by('-created_at')[offset:(offset+limit)].all()
+        products = Product.objects.select_related('image'
+                                                 ).filter(on_sale=on_sale
+                                                 ).order_by('-created_at'
+                                                 )[offset:(offset+limit)].all()
         for product in products:
             result.append(
                 {
@@ -133,7 +138,5 @@ class ProductView(View):
                                     ] if product.image else None
                 }
             )
-        
+
         return JsonResponse({'result':result}, status = 200)
-
-
