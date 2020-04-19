@@ -18,8 +18,8 @@ from .utils         import login_decorator
 class UserProductView(View):
     @login_decorator
     def get(self, request, sale_status):
-        offset = int(request.GET['offset'])
-        limit  = int(request.GET['limit'])
+        offset = int(request.GET.get('offset',0))
+        limit  = int(request.GET.get('limit',10))
 
         on_sale = sale_status
         products = Product.objects.select_related('seller'
@@ -38,7 +38,7 @@ class UserProfile(View):
         result = dict()
         result['nickname'] = request.user.nickname
         result['has_dog']  = request.user.has_dog
-        result['has_cat']  = reqeust.user.has_cat
+        result['has_cat']  = request.user.has_cat
         
         return JsonResponse({'result':result}, status = 200)
 
