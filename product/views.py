@@ -125,6 +125,7 @@ class ProductListView(View):
                 {
                     "id"          : product.id,
                     "title"       : product.title,
+                    "seller_id".  : product.seller.id,
                     "content"     : product.content,
                     "price"       : product.price,
                     "places"      : product.places,
