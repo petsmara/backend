@@ -54,7 +54,6 @@ class ImageView(View):
         image_file = BytesIO()
         img.save(image_file, 'JPEG')
         image_file.seek(0)
-        # data.file = image_file
         return image_file
 
     @login_decorator
