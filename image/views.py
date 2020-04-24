@@ -5,7 +5,7 @@ import time
 
 from django.views import View
 from django.http  import JsonResponse, HttpResponse
-from PIL          import Image
+from PIL          import Image, ExifTags
 from io           import BytesIO
 
 from user.utils   import login_decorator
@@ -29,30 +29,25 @@ class ImageView(View):
         return new_filename
 
     def _resize_file(self, file):
-        max_width, max_height = 500, 500
-
-        img = Image.open(file)
-        src_width, src_height = img.size
-        src_ratio = float(src_width) / float(src_height)
-        dst_width, dst_height = max_width, max_height
-        dst_ratio = float(dst_width) / float(dst_height)
- 
-        if dst_ratio < src_ratio:
-            crop_height = src_height
-            crop_width  = crop_height * dst_ratio
-            x_offset    = int(src_width - crop_width) // 2
-            y_offset    = 0
-        else:
-            crop_width = src_width
-            crop_height = crop_width / dst_ratio
-            x_offset = 0
-            y_offset = int(src_height - crop_height) // 3
+        standard_size = (500, 500)
         
-        img = img.crop((x_offset, y_offset, x_offset+int(crop_width), y_offset+int(crop_height)))
-        img = img.resize((dst_width, dst_height), Image.ANTIALIAS)
-
+        image = Image.open(file)
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif = dict(image._getexif().items())
+        
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+        
+        image = image.resize(standard_size, Image.ANTIALIAS)
+        image = image.convert("RGB")
         image_file = BytesIO()
-        img.save(image_file, 'JPEG')
+        image.save(image_file, 'JPEG')
         image_file.seek(0)
         return image_file
 
