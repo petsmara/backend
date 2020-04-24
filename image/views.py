@@ -5,7 +5,7 @@ import time
 
 from django.views import View
 from django.http  import JsonResponse, HttpResponse
-from PIL          import Image, ExifTags
+from PIL          import Image, ImageOps, ExifTags
 from io           import BytesIO
 
 from user.utils   import login_decorator
@@ -32,18 +32,22 @@ class ImageView(View):
         standard_size = (500, 500)
         
         image = Image.open(file)
-        for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation]=='Orientation':
-                break
-        exif = dict(image._getexif().items())
+        try:
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation]=='Orientation':
+                    break
+            exif = dict(image._getexif().items())
         
-        if exif[orientation] == 3:
-            image=image.rotate(180, expand=True)
-        elif exif[orientation] == 6:
-            image=image.rotate(270, expand=True)
-        elif exif[orientation] == 8:
-            image=image.rotate(90, expand=True)
+            if exif[orientation] == 3:
+                image=image.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                image=image.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                image=image.rotate(90, expand=True)
         
+        except:
+            pass
+
         image = image.resize(standard_size, Image.ANTIALIAS)
         image = image.convert("RGB")
         image_file = BytesIO()
