@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = my_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -149,4 +149,25 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-width',
 )
+
+LOGGING = { 
+        'version': 1, 
+        'disable_existing_loggers': False, 
+        'handlers': { 
+            'file': { 
+                'level': 'DEBUG', 
+                'class': 'logging.FileHandler', 
+                'filename': 'debug.log', 
+            }, 
+        }, 
+        'loggers': { 
+            'django': { 
+                'handlers': ['file'], 
+                'level': 'DEBUG', 
+                'propagate': True, 
+            }, 
+        }, 
+}
+
+
 
