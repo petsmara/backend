@@ -9,8 +9,8 @@ from django.db                  import IntegrityError
 from django.core.validators     import validate_email
 from django.core.exceptions     import ValidationError
 from django.core.mail           import EmailMessage
-from django.utils.encoding      import force_bytes
-from django.utils.http          import urlsafe_base64_encode
+from django.utils.encoding      import force_bytes, force_text
+from django.utils.http          import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding      import force_text
 from django.utils.http          import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -22,34 +22,51 @@ from image.models   import Image
 from .models        import User
 from .utils         import login_decorator    
 
-class RwdResetView(View):
-    def post(self, request):
-        # PasswordResetTokenGenerator().check_token(user, token)
-
-class PwdResetRequestView(View):
+class PasswordResetView(View):
     reset_pwd_link = 'https://petsbab.com/reset-your-password'
     
     def _send_pwd_reset_email(self, user, uid=None, token=None):
         subject = "팻츠밥 패스워드 복구 이메일"
         message = "아래의 링크를 클릭하여 패스워드를 복구하세요.\n"
-        message += (PwdRecoveryRequestView.reset_pwd_link+"?uid="+data['uid']+"&token="+data['token'])
+        message += (PasswordResetView.reset_pwd_link+"?uid="+uid+"&token="+token)
         email = EmailMessage(subject, message, to=[user.email])
         email.send()
 
     def post(self, request):
+        data = json.loads(request.body)
+        
         try:
-            data = json.loads(request.body)
             email = data['email']
+            user = User.objects.get(email=email)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            self._send_pwd_reset_email(user, uid=uid, token=token)
+            rlt = dict()
+            rlt['uid'] = uid
+            rlt['token'] = token
+            return JsonResponse({'url':rlt}, status = 200)
 
-            if email:
-                user = User.objects.get(email=email)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = PasswordResetTokenGenerator().make_token(user)
-                self._send_pwd_reset_email(user, uid=uid, token=token)
-                rlt = dict()
-                rlt['uid'] = uid
-                rlt['token'] = token
-                return JsonResponse({'url':rlt}, status = 200)
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER'}, status = 400)
+        except KeyError:
+            return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
+
+    def patch(self, request):
+        data = json.loads(request.body)
+
+        try:
+            token = data['token']
+            uid = force_text(urlsafe_base64_decode(data['uid']))
+            user = User.objects.get(id=uid)
+            password = data['password']
+
+            if PasswordResetTokenGenerator().check_token(user, token):
+                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+                user = User(password = hashed_password.decode('utf-8'))
+                user.save()
+                return JsonResponse({'message':'Password Reset Success'}, status = 200)
+            else:
+                return JsonResponse({'message':'Invalid Token'}, status = 401)
 
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status = 400)
