@@ -101,6 +101,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# EMAIL
+EMAIL_BACKEND = my_settings.EMAIL_BACKEND
+EMAIL_HOST = my_settings.EMAIL_HOST
+EMAIL_PORT = my_settings.EMAIL_PORT
+EMAIL_HOST_USER = my_settings.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = my_settings.EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = my_settings.EMAIL_USE_TLS
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -150,6 +157,8 @@ CORS_ALLOW_HEADERS = (
     'x-requested-width',
 )
 
+
+"""
 LOGGING = { 
         'version': 1, 
         'disable_existing_loggers': False, 
@@ -169,5 +178,5 @@ LOGGING = {
         }, 
 }
 
-
+"""
 
