@@ -14,6 +14,7 @@ class SingleProductView(View):
     def _product_info(self, product):
             result                = {}
             result['id']          = product.id
+            result['view_count']  = product.view_count
             result['seller']      = product.seller.nickname
             result['title']       = product.title
             result['content']     = product.content
@@ -35,6 +36,9 @@ class SingleProductView(View):
     def get(self, request, product_id):
         try:
             product = Product.objects.select_related('image').get(id=product_id)
+            product.view_count += 1
+            product.save()
+
             result  = self._product_info(product)
             return JsonResponse({'result':result}, status = 200)
 
@@ -124,6 +128,7 @@ class ProductListView(View):
             result.append(
                 {
                     "id"          : product.id,
+                    "view_count"  : product.view_count,
                     "title"       : product.title,
                     "seller_id"   : product.seller.id,
                     "seller"      : product.seller.nickname,
@@ -145,3 +150,4 @@ class ProductListView(View):
             )
 
         return JsonResponse({'result':result}, status = 200)
+
