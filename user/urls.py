@@ -6,7 +6,7 @@ from .views import (
                     AuthView, 
                     UserProfile,
                     UserProductView,
-                    PwdRecoveryRequestView,
+                    PwdResetRequestView,
                     )
 
 urlpatterns = [
@@ -15,5 +15,5 @@ urlpatterns = [
     path('/account/login', AuthView.as_view()),
     path('/account/profile', UserProfile.as_view()),
     path('/account/product/<int:sale_status>', UserProductView.as_view()),
-    path('/account/recovery', PwdRecoveryRequestView.as_view()),
+    path('/account/recovery', PwdResetRequestView.as_view()),
 ]
