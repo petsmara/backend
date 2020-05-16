@@ -6,6 +6,7 @@ from .views import (
                     AuthView, 
                     UserProfile,
                     UserProductView,
+                    PasswordRecoveryView,
                     )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('/account/login', AuthView.as_view()),
     path('/account/profile', UserProfile.as_view()),
     path('/account/product/<int:sale_status>', UserProductView.as_view()),
+    path('/account/recovery', PasswordRecoveryView.as_view()),
 ]

@@ -3,17 +3,52 @@ import json
 import http
 import bcrypt
 
-from django.views           import View
-from django.http            import JsonResponse, HttpResponse
-from django.db              import IntegrityError
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
+from django.views               import View
+from django.http                import JsonResponse, HttpResponse
+from django.db                  import IntegrityError
+from django.core.validators     import validate_email
+from django.core.exceptions     import ValidationError
+from django.core.mail           import EmailMessage
+from django.utils.encoding      import force_bytes
+from django.utils.http          import urlsafe_base64_encode
+from django.utils.encoding      import force_text
+from django.utils.http          import urlsafe_base64_decode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.tokens import default_token_generator
 
 from my_settings    import SECRET_KEY
 from product.models import Product
 from image.models   import Image
 from .models        import User
 from .utils         import login_decorator    
+
+class PasswordRecoveryView(View):
+    def _send_pwd_recovery_email(self, user):
+        subject = "팻츠밥 패스워드 복구 이메일"
+        message = "link"
+        email = EmailMessage(subject, message, to=[user.email])
+        email.send()
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            email = data['email']
+
+            if email:
+                user = User.objects.get(email=email)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = PasswordResetTokenGenerator().make_token(user)
+                # self._send_pwd_recovery_email(user)
+                rlt = dict()
+                rlt['uid'] = uid
+                rlt['token'] = token
+                return JsonResponse({'url':rlt}, status = 200)
+
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER'}, status = 400)
+        except KeyError:
+            return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
+
 
 class UserProductView(View):
     @login_decorator

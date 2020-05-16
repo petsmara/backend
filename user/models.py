@@ -9,6 +9,7 @@ class User(models.Model):
     has_dog      = models.NullBooleanField(default = False)
     created_at   = models.DateTimeField(auto_now_add = True)
     updated_at   = models.DateTimeField(auto_now     = True)
+    last_login   = models.DateTimeField(null = True)
 
     class Meta:
         db_table = 'users'
