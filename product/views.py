@@ -46,6 +46,34 @@ class SingleProductView(View):
             return JsonResponse({'message':'INVALID_PRODUCT_ID'}, status = 401)
 
     @login_decorator
+    def put(self, request, product_id):
+        try:
+            data = json.loads(request.body)
+            product = Product.objects.select_related('image').get(id=product_id)
+
+            if product.seller == request.user:
+                title    = data.get('title')
+                content  = data.get('content')
+                price    = data.get('price')
+                places   = data.get('places')
+                category = data.get('category')
+                
+                if title: product.title = title
+                if content: product.content = content
+                if price: product.price = price
+                if places: product.places = places
+                product.save()
+
+                result  = self._product_info(product)
+                return JsonResponse({'result':result}, status = 200)
+            
+            else:
+                return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
+
+        except Product.DoesNotExist:
+            return JsonResponse({'message':'INVALID_ID'}, status = 401)
+
+    @login_decorator
     def patch(self, request, product_id):
         try:
             product = Product.objects.select_related('image').get(id=product_id)
