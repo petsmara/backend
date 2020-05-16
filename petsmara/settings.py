@@ -85,6 +85,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
+PASSWORD_RESET_TIMEOUT_DAYS = 1
 
 AUTH_PASSWORD_VALIDATORS = [
     {

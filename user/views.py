@@ -22,14 +22,17 @@ from image.models   import Image
 from .models        import User
 from .utils         import login_decorator    
 
+class RwdResetView(View):
+    def post(self, request):
+        # PasswordResetTokenGenerator().check_token(user, token)
 
-class PwdRecoveryRequestView(View):
+class PwdResetRequestView(View):
     reset_pwd_link = 'https://petsbab.com/reset-your-password'
     
-    def _send_pwd_recovery_email(self, user, uid, token):
+    def _send_pwd_reset_email(self, user, uid=None, token=None):
         subject = "팻츠밥 패스워드 복구 이메일"
         message = "아래의 링크를 클릭하여 패스워드를 복구하세요.\n"
-        message += (PwdRecoveryRequestView.reset_pwd_link+"?uid="+uid+"&token="+token)
+        message += (PwdRecoveryRequestView.reset_pwd_link+"?uid="+data['uid']+"&token="+data['token'])
         email = EmailMessage(subject, message, to=[user.email])
         email.send()
 
@@ -42,7 +45,7 @@ class PwdRecoveryRequestView(View):
                 user = User.objects.get(email=email)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = PasswordResetTokenGenerator().make_token(user)
-                self._send_pwd_recovery_email(user, uid, token)
+                self._send_pwd_reset_email(user, uid=uid, token=token)
                 rlt = dict()
                 rlt['uid'] = uid
                 rlt['token'] = token
