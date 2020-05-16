@@ -46,7 +46,7 @@ class SingleProductView(View):
             return JsonResponse({'message':'INVALID_PRODUCT_ID'}, status = 401)
 
     @login_decorator
-    def put(self, request, product_id):
+    def patch(self, request, product_id):
         try:
             product = Product.objects.select_related('image').get(id=product_id)
 
