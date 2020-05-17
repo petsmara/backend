@@ -44,7 +44,7 @@ class PasswordResetView(View):
             rlt = dict()
             rlt['uid'] = uid
             rlt['token'] = token
-            return JsonResponse({'url':rlt}, status = 200)
+            return JsonResponse({'url':rlt}, status = 201)
 
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status = 400)
@@ -64,7 +64,7 @@ class PasswordResetView(View):
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                 user = User(password = hashed_password.decode('utf-8'))
                 user.save()
-                return JsonResponse({'message':'Password Reset Success'}, status = 200)
+                return JsonResponse({'message':'Password Reset Success'}, status = 201)
             else:
                 return JsonResponse({'message':'Invalid Token'}, status = 401)
 
@@ -144,7 +144,7 @@ class UserView(View):
                     'has_dog'      : user.has_dog,
                     'has_cat'      : user.has_cat
                 },
-                status = 200
+                status = 201
             )
 
         except KeyError:
@@ -171,7 +171,7 @@ class AuthView(View):
                         'has_dog'      : user.has_dog,
                         'has_cat'      : user.has_cat
                     }, 
-                    status = 200
+                    status = 201
                 )
 
             return JsonResponse({'message':'INVALID_PASSWORD'}, status = 401)
