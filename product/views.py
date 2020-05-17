@@ -65,7 +65,7 @@ class SingleProductView(View):
                 product.save()
 
                 result  = self._product_info(product)
-                return JsonResponse({'result':result}, status = 200)
+                return JsonResponse({'result':result}, status = 201)
             
             else:
                 return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
@@ -82,7 +82,7 @@ class SingleProductView(View):
                 product.on_sale = False
                 product.save()
                 result = self._product_info(product)
-                return JsonResponse({'result':result}, status = 200)
+                return JsonResponse({'result':result}, status = 201)
             else:
                 return JsonResponse({'message':'INVALID_ACCESS'}, status = 401)
 
@@ -134,7 +134,7 @@ class ProductView(View):
                 )
             product.save()
 
-            return JsonResponse({'product_id':product.id}, status = 200)
+            return JsonResponse({'product_id':product.id}, status = 201)
 
         except KeyError:
             return JsonResponse({'message':'INVALID_KEYS'}, status = 400)
