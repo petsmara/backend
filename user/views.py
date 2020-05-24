@@ -62,7 +62,7 @@ class PasswordResetView(View):
 
             if PasswordResetTokenGenerator().check_token(user, token):
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-                user = User(password = hashed_password.decode('utf-8'))
+                user.password = hashed_password.decode('utf-8')
                 user.save()
                 return JsonResponse({'message':'Password Reset Success'}, status = 201)
             else:
