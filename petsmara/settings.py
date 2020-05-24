@@ -33,6 +33,7 @@ INSTALLED_APPS += [
     'user',
     'product',
     'image',
+    'comment',
 ]
 
 MIDDLEWARE = [
